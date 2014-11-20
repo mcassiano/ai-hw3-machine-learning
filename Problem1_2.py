@@ -24,8 +24,11 @@ def main():
     print "Feature 'age' - Mean: %f, STD: %f" % (age_mean, age_std)
     print "Feature 'weight' - Mean: %f, STD: %f" % (weight_mean, weight_std)
 
-    x[:,1] = (x[:,1] - age_mean)/age_std
-    x[:,2] = (x[:,2] - weight_mean)/weight_std
+    x_scaled = np.array(x)
+
+    x_scaled[:,0] = ones
+    x_scaled[:,1] = (x[:,1] - age_mean)/age_std
+    x_scaled[:,2] = (x[:,2] - weight_mean)/weight_std
     
     m, n = x.shape
 
@@ -39,16 +42,16 @@ def main():
     for alpha_i in range(0, len(alphas)):
         theta_sim = np.zeros(n)
         for iteration_n in iterations:
-            theta_sim = lr.gradient_descent(x, y, theta_sim, alphas[alpha_i], iteration_n)
-            prediction = np.dot(x, theta_sim)
+            theta_sim = lr.gradient_descent(x_scaled, y, theta_sim, alphas[alpha_i], iteration_n)
+            prediction = np.dot(x_scaled, theta_sim)
             loss = prediction - y
             risk[alpha_i][iteration_n] = lr.calculate_cost(loss, m)
 
     for alpha_i in range(0, len(alphas)):
         plt.plot(iterations, risk[alpha_i], label='Alpha: %f' % alphas[alpha_i])
 
-    theta = lr.gradient_descent(x,y,np.zeros(n), 1.0, 50)
-    prediction = np.dot(x, theta)
+    theta = lr.gradient_descent(x_scaled,y,np.zeros(n), 1.0, 50)
+    prediction = np.dot(x_scaled, theta)
 
     point_to_guess = [1.0, (5.0-age_mean)/age_std, (20.0-weight_mean)/weight_std]
     guess = np.sum(np.dot(theta, point_to_guess))
@@ -58,7 +61,10 @@ def main():
     plt.legend()
     plt.show()
 
-
+    # 2.4
+    
+    p = np.matrix(x)
+    theta = lr.normal_equation(p, y)
 
 if __name__ == "__main__":
     main()

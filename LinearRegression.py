@@ -20,3 +20,6 @@ class LinearRegression:
             #cost_history[i] = self.calculate_cost(loss, m)
 
         return theta#, theta_history, cost_history
+
+    def normal_equation(self, x, y):
+        return np.dot(np.dot((x.T.dot(x)).I, x.T), y)
