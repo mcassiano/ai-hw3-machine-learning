@@ -6,6 +6,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.grid_search import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
 
 
 def plot_decision_boundary(model, subplot, classes, labels, x_train, y_train):
@@ -44,10 +45,10 @@ def main():
     # settings variables to train data
     
     k_folds = [5, 10]
-    k_neighbors = [3,4,5,6] #[1,2,3,4,5,6,7,8]
-    degrees = [1,2,3]#[1,2,3,4,5,6]
-    gammas = [10]#[0.01, 0.1, 1, 10]
-    cs = [1]#0.01, 0.1, 1, 10]
+    k_neighbors = [1,2,3,4,5,6,7,8]
+    degrees = [4,5,6]
+    gammas = [0.1, 1, 10]
+    cs = [1, 10]
 
     params_svm_knn = {
         'rbf': [{'kernel': ['rbf'], 'gamma': gammas, 'C': cs}],
@@ -70,18 +71,19 @@ def main():
 
     for k in k_folds:
         for classifier, params in params_svm_knn.items():
+            print classifier
 
             if classifier != 'knn':
                 clf = GridSearchCV(svm.SVC(), params, cv=k)
                 clf.fit(X_train, y_train)
-                scores[classifier].append([clf.best_score_, k, clf.best_params_])
-                score_history.append(clf.grid_scores_)
+                
 
             else:
                 clf = GridSearchCV(KNeighborsClassifier(), params, cv=k)
                 clf.fit(X_train, y_train)
-                scores[classifier].append([clf.best_score_, k, clf.best_params_])
-                score_history.append(clf.grid_scores_)
+
+            scores[classifier].append([clf.best_score_, k, clf.best_params_])
+            score_history.append([k, clf.grid_scores_])
         
 
     best_rbf = max(scores['rbf'], key = lambda s: s[0])
@@ -150,6 +152,45 @@ def main():
                 X_train, y_train)
 
         score_history.append(classifier.score(X_train, y_train))
+
+    
+    print "Best models...\n"
+
+    print best_rbf
+    print best_linear
+    print best_poly
+    print best_knn
+
+    print "Printing training scores...\n"
+
+    for score in score_history:
+        if type(score) != np.float64:
+            print '# k-folds: %d' % score[0]
+            for run in score[1]:
+                for key, value in run.parameters.items():
+                    print "%s: %s" % (key, value)
+                print 'Mean: %f' % (run.mean_validation_score)
+                print '----\n'
+        else:
+            print score
+
+    print "\nPrinting test scores...\n"
+
+    y_pred = lin.predict(X_test)
+    print "Test score for Linear kernel: %f" % accuracy_score(y_test, y_pred)
+
+    y_pred = poly.predict(X_test)
+    print "Test score for Polynomial kernel: %f" % accuracy_score(y_test, y_pred)
+
+    y_pred = rbf.predict(X_test)
+    print "Test score for RBF kernel: %f" % accuracy_score(y_test, y_pred)
+
+    y_pred = knn.predict(X_test)
+    print "Test score for KNN: %f" % accuracy_score(y_test, y_pred)
+
+    for classifier in other_classifiers:
+        y_pred = classifier[0].predict(X_test)
+        print "Test score for %s: %f" % (classifier[1], accuracy_score(y_test, y_pred))
 
 
     plt.show()
