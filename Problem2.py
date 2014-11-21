@@ -4,6 +4,8 @@ from sklearn import cross_validation
 from sklearn import svm
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.grid_search import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 def plot_data(model, fig, x, y):
 
@@ -31,14 +33,17 @@ def main():
 
     fig = plt.figure()
 
-    data_distribution = fig.add_subplot(2, 3, 1)
-    data_distribution.scatter(classes[:,0], classes[:,1], c=labels, marker='o', zorder=2)
-    data_distribution.set_title('Data distribuition', fontsize=12)
+    data_distribution = fig.add_subplot(2,2,1)
+
+    data_distribution.scatter(classes[:,0], classes[:,1],
+        c=labels, marker='o', zorder=2)
+
+    data_distribution.set_title('Data distribuition', fontsize=10)
     
-    graph_linear = fig.add_subplot(2, 3, 2)
-    graph_poly = fig.add_subplot(2, 3, 3)
-    graph_rbf = fig.add_subplot(2, 3, 4)
-    graph_knn = fig.add_subplot(2,3, 5)
+    graph_linear = fig.add_subplot(2, 2, 2)
+    graph_poly = fig.add_subplot(2, 2, 3)
+    graph_rbf = fig.add_subplot(2, 2, 4)
+    
 
 
     # setting variables for data splitting
@@ -66,6 +71,12 @@ def main():
         {'n_neighbors': k_neighbors}
     ]
 
+    other_classifiers = [
+        (RandomForestClassifier(), 'Random Forest'),
+        (AdaBoostClassifier(), 'ADA Boost'),
+        (DecisionTreeClassifier(), 'Decision Tree')
+    ]
+
     scores = {}
     for classifier in ['rbf', 'linear', 'poly', 'knn']:
         scores[classifier] = []
@@ -86,6 +97,18 @@ def main():
     best_poly = max(scores['poly'], key = lambda s: s[0])
     best_knn = max(scores['knn'], key = lambda s: s[0])
 
+    fig2 = plt.figure()
+    fig2.suptitle('Other classifiers')
+
+    graph_knn = fig2.add_subplot(2,2,1)
+
+    for i in range(2, 5):
+        c = other_classifiers[i-2][0]
+        c = c.fit(X_train, y_train)
+        l = fig2.add_subplot(2,2,i)
+        l.set_title(other_classifiers[i-2][1], fontsize=10)
+        plot_data(c, l, X_test, y_test)
+
 
     lin = svm.SVC(**best_linear[2]).fit(X_test, y_test)
     poly = svm.SVC(**best_poly[2]).fit(X_test, y_test)
@@ -93,16 +116,27 @@ def main():
     knn = KNeighborsClassifier(**best_knn[2]).fit(X_train, y_train)
 
     plot_data(lin, graph_linear, X_test, y_test)
-    graph_linear.set_title("Linear. C = %0.1f" % best_linear[2]['C'], fontsize=10)
+
+    graph_linear.set_title("Linear. C = %0.1f. Folds = %d" %
+        (best_linear[2]['C'], best_linear[1]), fontsize=10)
 
     plot_data(poly, graph_poly, X_test, y_test)
-    graph_poly.set_title("Poly. C = %0.1f, d = %d" % (best_poly[2]['C'], best_poly[2]['degree']), fontsize=10)
 
+    graph_poly.set_title("Poly. C = %0.1f, d = %d, Folds = %d" %
+        (best_poly[2]['C'], best_poly[2]['degree'],
+            best_poly[1]), fontsize=10)
+
+    
     plot_data(rbf, graph_rbf, X_test, y_test)
-    graph_rbf.set_title("RBF C = %0.1f, g = %0.1f" % (best_rbf[2]['C'], best_rbf[2]['gamma']), fontsize=10)
+
+    graph_rbf.set_title("RBF C = %0.1f, g = %0.1f, Folds = %d" %
+        (best_rbf[2]['C'], best_rbf[2]['gamma'],
+            best_rbf[1]), fontsize=10)
 
     plot_data(knn, graph_knn, X_test, y_test)
-    graph_knn.set_title("K-Nearest neighbors. K = %d" % best_knn[2]['n_neighbors'], fontsize=10)
+
+    graph_knn.set_title("KNN. K = %d, Folds = %d" %
+        (best_knn[2]['n_neighbors'], best_knn[1]), fontsize=10)
 
 
     plt.show()
