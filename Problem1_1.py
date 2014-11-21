@@ -14,6 +14,8 @@ def main():
     y = data[:,1]
 
     plt.scatter(x[:,1], y)
+    plt.ylabel('Height')
+    plt.xlabel('Age')
 
     # 1.2
     
@@ -25,7 +27,8 @@ def main():
 
     # 1.3 
     prediction = np.dot(x, theta)
-    plt.plot(x[:,1], prediction)
+    plt.plot(x[:,1], prediction, label = "%fx + %f" % (theta[1], theta[0]))
+    plt.legend()
 
     theta0_vals = np.linspace(-1.0, 1.0, 100)
     theta1_vals = np.linspace(-1.0, 1.0, 100)

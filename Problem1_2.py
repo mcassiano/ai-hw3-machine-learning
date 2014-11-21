@@ -50,21 +50,33 @@ def main():
     for alpha_i in range(0, len(alphas)):
         plt.plot(iterations, risk[alpha_i], label='Alpha: %f' % alphas[alpha_i])
 
-    theta = lr.gradient_descent(x_scaled,y,np.zeros(n), 1.0, 50)
+    theta = lr.gradient_descent(x_scaled,y,np.zeros(n), 1.0, iterations_n)
     prediction = np.dot(x_scaled, theta)
+
 
     point_to_guess = [1.0, (5.0-age_mean)/age_std, (20.0-weight_mean)/weight_std]
     guess = np.sum(np.dot(theta, point_to_guess))
 
+    print "Betas: %s" % (theta)
     print "The 5 year girl weighting 20 is approximately %f m tall." % (guess)
-
-    plt.legend()
-    plt.show()
+    print "error %f" % lr.calculate_cost(prediction -y, m)
 
     # 2.4
     
     p = np.matrix(x)
     theta = lr.normal_equation(p, y)
+    theta = np.ravel(theta)
+    guess = np.sum(np.dot(theta, [1.0, 5.0, 20.0]))
+    prediction = np.dot(x, theta.flatten())
+
+    print "Betas: %s" % (theta)
+    print "The 5 year girl weighting 20 is approximately %f m tall." % (guess)
+    print "error %f" % lr.calculate_cost(prediction - y, m)
+
+    plt.ylabel('Risk')
+    plt.xlabel('# of Iterations')
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     main()
