@@ -70,23 +70,44 @@ Normal Equations yield the same predictions as Gradient Descent. The reason is t
 
 \section{Problem 2}
 
-\subsection{Linear}
+On Problem 2 we were asked do perfom classification on a dataset found in \path{chessboard.csv}. First, I trained the data using the three SVM kernels (Linear, Polynomial and RBF). We also needed to train our data using cross-validation with stratified sampling. All of these operations are available out of the box on \path{scikit-learn} package for Python. As extra credit, I also performed classification using other 4 classifiers: K-Nearest Neighbors, Random Forest, ADA Boost and Decision Tree.
+
+\subsection{Training the data}
+
+To train my model I used CVGridSearch from \path{Sklearn} to search for a good set of parameters for each kernel. I perfomed two rounds one using a different number of folds for cross-validation (5 and 10). The C parameter for all SVC was either 1 or 10. For RBC I used $\gamma = {0.1, 1, 10}$. Using a degree below 3 was giving me really poor classification so I decided to cap them from the range. The chosen values for polynomial degree were 4,5 and 6.
+
+The results were pretty solid. Except for the Linear Kernel (which makes sense because the labels can't be separated by a line with this distribution), all of them performed reasonably well. See Figure \ref{main_classifiers} for data distribution and decision boundaries for the SVM classifiers.
+
+\subsection{Results}
+
+I compiled in tables the mean score for each cross-validation run with the possible parameters. The best results for each classifier is colored in green.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{main_classifiers}
+\caption{Data distribution and Decision boundaries for SVM classifiers}
+\includegraphics[width=\textwidth]{extra_classifiers}
+\caption{Decision boundaries for extra classifiers}
+\label{main_classifiers}
+\end{figure}
+
+\subsubsection{Linear kernel}
 
 \begin{table}[htb]
 \begin{tabular}{|c|c|c|}
 \hline
 \textbf{K-Folds} & \textbf{C}  & \textbf{Train accuracy}    \\ \hline
 \rowcolor[HTML]{34FF34} 
-\textbf{5}       & \textbf{1}  & \textbf{0.620000} \\ \hline
+5       & 1  & 0.620000 \\ \hline
 5       & 1  & 0.620000 \\ \hline
 10      & 10 & 0.620000 \\ \hline
 10      & 10 & 0.620000 \\ \hline
 \end{tabular}
 \end{table}
 
-\subsection{Polynomial}
+\subsubsection{Polynomial}
 
-\begin{table}[htb]
+\begin{table}[h]
 \begin{tabular}{|c|c|c|c|}
 \hline
 \textbf{K-folds} & \textbf{C}  & \textbf{Degree} & \textbf{Train accuracy}    \\ \hline
@@ -106,9 +127,11 @@ Normal Equations yield the same predictions as Gradient Descent. The reason is t
 \end{tabular}
 \end{table}
 
-\subsection{RBF}
+\pagebreak
 
-\begin{table}[htb]
+\subsubsection{RBF}
+
+\begin{table}[h]
 \begin{tabular}{|c|c|c|c|}
 \hline
 \textbf{K-Folds} & \textbf{C} & \textbf{Gamma} & \textbf{Train accuracy} \\ \hline
@@ -128,7 +151,8 @@ Normal Equations yield the same predictions as Gradient Descent. The reason is t
 \end{tabular}
 \end{table}
 
-\subsection{K-Nearest Neighbors}
+
+\subsubsection{K-Nearest Neighbors}
 
 \begin{table}[htb]
 \begin{tabular}{|c|c|c|}
@@ -154,7 +178,9 @@ Normal Equations yield the same predictions as Gradient Descent. The reason is t
 \end{tabular}
 \end{table}
 
-\subsection{Other classifiers}
+\pagebreak
+
+\subsubsection{Other classifiers and test scores}
 
 \begin{table}[htb]
 \begin{tabular}{|c|c|c|}
@@ -169,5 +195,9 @@ ADA Boost           & 0.743333333333          & 0.605000               \\ \hline
 Decision Tree       & 1.0                     & 0.990000               \\ \hline
 \end{tabular}
 \end{table}
+
+\subsection{Conclusion}
+
+This was a really good exercice for me. I learned tons, not only from the Machine Learning field but how to use Python to produce charts and representations. I also liked the fact that I could found I better predictor than what I initially guessed would be the best (Decision Tree was the best classifier here). Hopefully I would get more hands on experience on this field soon.
 
 \end{document}
